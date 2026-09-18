@@ -10,6 +10,10 @@ router.post("/", async (req, res) => {
       ? req.body.perks.split(",").map((item) => item.trim()).filter(Boolean)
       : [];
 
+  const createdBy = String(
+    req.body.createdBy || req.body.accountId || req.body.userId || req.body.adminUsername || req.body.created_by || ""
+  ).trim();
+
   const jobdata = new Job({
     title: req.body.title,
     company: req.body.company,
@@ -23,6 +27,7 @@ router.post("/", async (req, res) => {
     AdditionalInfo: req.body.AdditionalInfo,
     CTC: req.body.CTC,
     StartDate: req.body.StartDate,
+    createdBy: createdBy || undefined,
   });
 
   try {
@@ -36,7 +41,11 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const data = await Job.find();
+    const query = {};
+    const createdBy = String(req.query.createdBy || "").trim();
+    if (createdBy) query.createdBy = createdBy;
+
+    const data = await Job.find(query).sort({ createAt: -1 });
     res.json(data).status(200);
   } catch (error) {
     console.log(error);

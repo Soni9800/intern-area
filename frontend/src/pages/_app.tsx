@@ -5,6 +5,7 @@ import type { AppProps } from "next/app";
 import { store } from "../store/store";
 import { Provider, useDispatch } from "react-redux";
 import { useEffect } from "react";
+import type { User } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
 import { login, logout } from "@/Feature/Userslice";
 import { getUserAvatar } from "@/utils/avatar";
@@ -21,7 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
         localStorage.setItem("internareaAccount", JSON.stringify(account));
         dispatch(login(account));
       }
-      auth.onAuthStateChanged((authuser) => {
+      auth.onAuthStateChanged((authuser: User | null) => {
         if (authuser) {
           const identity = authuser.email || authuser.uid;
           const storedAccount = localStorage.getItem("internareaAccount");

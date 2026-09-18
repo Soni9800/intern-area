@@ -56,18 +56,31 @@ const index = () => {
     stipend: 50,
   });
   const [internshipData,setinternship]=useState<any>([])
+  const [currentCreator, setCurrentCreator] = useState("");
+
+  useEffect(() => {
+    const storedAccount = localStorage.getItem("internareaAccount");
+    const adminUsername = localStorage.getItem("adminUsername") || "";
+    const parsedAccount = storedAccount ? JSON.parse(storedAccount) : null;
+    setCurrentCreator(String(parsedAccount?.id || parsedAccount?.uid || parsedAccount?.email || adminUsername || "").trim());
+  }, []);
+
   useEffect(()=>{
     const fetchdata=async()=>{
       try {
-        const res=await axios.get(`${apiBaseUrl}/api/internship`)
+        const query = currentCreator ? `?createdBy=${encodeURIComponent(currentCreator)}` : "";
+        const res=await axios.get(`${apiBaseUrl}/api/internship${query}`)
         setinternship(res.data)
         setfilteredInternships(res.data)
       } catch (error) {
         console.log(error)
       }
     }
-    fetchdata()
-  },[])
+
+    if (typeof window !== "undefined") {
+      fetchdata()
+    }
+  },[currentCreator])
   useEffect(() => {
     const filtered = internshipData.filter((internship:any) => {
       const matchesCategory = internship.category

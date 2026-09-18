@@ -12,6 +12,11 @@ const Internshipschema = new mongoose.Schema({
   stipend: String,
   startDate: String,
   additionalInfo: String,
+  createdBy: {
+    type: String,
+    trim: true,
+    default: "",
+  },
   createdAt: {
     type: Date,
     default: Date.now,

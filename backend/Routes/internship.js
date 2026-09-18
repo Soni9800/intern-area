@@ -9,6 +9,10 @@ router.post("/", async (req, res) => {
       ? req.body.perks.split(",").map((item) => item.trim()).filter(Boolean)
       : [];
 
+  const createdBy = String(
+    req.body.createdBy || req.body.accountId || req.body.userId || req.body.adminUsername || req.body.created_by || ""
+  ).trim();
+
   const Internshipdata = new Internship({
     title: req.body.title,
     company: req.body.company,
@@ -22,6 +26,7 @@ router.post("/", async (req, res) => {
     stipend: req.body.stipend,
     startDate: req.body.startDate,
     additionalInfo: req.body.additionalInfo,
+    createdBy: createdBy || undefined,
   });
 
   try {
@@ -34,7 +39,11 @@ router.post("/", async (req, res) => {
 });
 router.get("/", async (req, res) => {
   try {
-    const data = await Internship.find();
+    const query = {};
+    const createdBy = String(req.query.createdBy || "").trim();
+    if (createdBy) query.createdBy = createdBy;
+
+    const data = await Internship.find(query).sort({ createdAt: -1 });
     res.json(data).status(200);
   } catch (error) {
     console.log(error);

@@ -12,6 +12,11 @@ const JobShcema = new mongoose.Schema({
   AdditionalInfo: String,
   CTC: String,
   StartDate: String,
+  createdBy: {
+    type: String,
+    trim: true,
+    default: "",
+  },
   createAt: {
     type: Date,
     default: Date.now,

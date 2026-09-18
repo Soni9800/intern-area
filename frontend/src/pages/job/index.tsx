@@ -125,18 +125,31 @@ const index = () => {
     experience: "",
   });
   const [jobs,setjobs]=useState<any>([])
+  const [currentCreator, setCurrentCreator] = useState("");
+
+  useEffect(() => {
+    const storedAccount = localStorage.getItem("internareaAccount");
+    const adminUsername = localStorage.getItem("adminUsername") || "";
+    const parsedAccount = storedAccount ? JSON.parse(storedAccount) : null;
+    setCurrentCreator(String(parsedAccount?.id || parsedAccount?.uid || parsedAccount?.email || adminUsername || "").trim());
+  }, []);
+
   useEffect(()=>{
     const fetchdata=async()=>{
       try {
-        const res=await axios.get(`${apiBaseUrl}/api/job`)
+        const query = currentCreator ? `?createdBy=${encodeURIComponent(currentCreator)}` : "";
+        const res=await axios.get(`${apiBaseUrl}/api/job${query}`)
         setjobs(res.data)
         setfilteredjobs(res.data)
       } catch (error) {
         console.log(error)
       }
     }
-    fetchdata()
-  },[])
+
+    if (typeof window !== "undefined") {
+      fetchdata()
+    }
+  },[currentCreator])
   useEffect(() => {
     const filtered = jobs.filter((job:any) => {
       const matchesCategory = job.category

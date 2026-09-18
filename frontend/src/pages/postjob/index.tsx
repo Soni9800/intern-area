@@ -21,6 +21,19 @@ const navigate = (path: string) => {
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
+const getCurrentCreator = () => {
+  if (typeof window === "undefined") return "";
+
+  try {
+    const stored = localStorage.getItem("internareaAccount");
+    const account = stored ? JSON.parse(stored) : null;
+    const adminUsername = localStorage.getItem("adminUsername") || "";
+    return String(account?.id || account?.uid || account?.email || adminUsername || "").trim();
+  } catch {
+    return String(localStorage.getItem("adminUsername") || "").trim();
+  }
+};
+
 const index = () => {
   const [formData, setFormData] = useState({
     title: "",
@@ -70,6 +83,7 @@ const index = () => {
       setisloading(true);
       const payload = {
         ...formData,
+        createdBy: getCurrentCreator(),
         perks: formData.perks
           .split(",")
           .map((item) => item.trim())

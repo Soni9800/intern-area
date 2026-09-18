@@ -124,12 +124,22 @@ export default function SvgSlider() {
   ];
   const [internships, setinternship] = useState<any>([]);
   const [jobs, setjob] = useState<any>([]);
+  const [currentCreator, setCurrentCreator] = useState("");
+
+  useEffect(() => {
+    const storedAccount = localStorage.getItem("internareaAccount");
+    const adminUsername = localStorage.getItem("adminUsername") || "";
+    const parsedAccount = storedAccount ? JSON.parse(storedAccount) : null;
+    setCurrentCreator(String(parsedAccount?.id || parsedAccount?.uid || parsedAccount?.email || adminUsername || "").trim());
+  }, []);
+
   useEffect(() => {
     const fetchdata = async () => {
       try {
+        const query = currentCreator ? `?createdBy=${encodeURIComponent(currentCreator)}` : "";
         const [internshipres, jobres] = await Promise.all([
-          axios.get(`${apiBaseUrl}/api/internship`),
-          axios.get(`${apiBaseUrl}/api/job`),
+          axios.get(`${apiBaseUrl}/api/internship${query}`),
+          axios.get(`${apiBaseUrl}/api/job${query}`),
         ]);
         setinternship(internshipres.data);
         setjob(jobres.data);
@@ -137,8 +147,11 @@ export default function SvgSlider() {
         console.log(error);
       }
     };
-    fetchdata();
-  }, []);
+
+    if (typeof window !== "undefined") {
+      fetchdata();
+    }
+  }, [currentCreator]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const filteredInternships = internships.filter(
     (item: any) => !selectedCategory || item.category === selectedCategory
