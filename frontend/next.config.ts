@@ -2,9 +2,14 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
   reactStrictMode: true,
+
+  output: "export",
+
+  basePath: "/intern-area",
+  assetPrefix: "/intern-area/",
+
   turbopack: {
     root: path.join(__dirname),
   },
